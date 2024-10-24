@@ -1,6 +1,6 @@
 // src/pages/TokenSalePage.jsx
-import React, { useState, useEffect } from 'react';
-import TokenSaleCard from '../components/TokenSaleCard';
+import React, { useState, useEffect } from "react";
+import TokenSaleCard from "../components/TokenSaleCard";
 
 const TokenSalePage = () => {
   const [tokens, setTokens] = useState([]);
@@ -8,8 +8,8 @@ const TokenSalePage = () => {
   useEffect(() => {
     // Fetch available tokens from your backend or Ethereum contract
     setTokens([
-      { id: 1, name: 'Token 1', price: 0.5, shares: 100 },
-      { id: 2, name: 'Token 2', price: 1.0, shares: 50 },
+      { id: 1, name: "Token 1", price: 0.5, shares: 100 },
+      { id: 2, name: "Token 2", price: 1.0, shares: 50 },
     ]);
   }, []);
 
