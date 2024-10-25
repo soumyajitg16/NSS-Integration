@@ -34,10 +34,11 @@ export async function vaultApproval(
     _amount,       // Number of tokens to buy
     _pricePerToken // Price per token in Wei
   ) {
-    const totalPayable = _pricePerToken * _amount;
+    const totalPayable = _pricePerToken.mul(_amount) ;
+    console.log(totalPayable.toString())
   
     const tx = await _contract.buyTokens(_seller, _amount, {
-      value: totalPayable // Total value sent
+      value: totalPayable.toString() // Total value sent
     });
   
     const receipt = await tx.wait();
@@ -70,6 +71,10 @@ export async function vaultApproval(
   export async function symbol(_contract) {
     const symbol = await _contract.symbol();
     return symbol;
+  }
+  export async function name(_contract) {
+    const name = await _contract.name();
+    return name;
   }
 
   export async function sellOffers(_contract,_addr) {
