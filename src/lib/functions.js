@@ -93,13 +93,13 @@ export async function makeOffer_(_contract,
   vaultId,
   percentage,
   _offerTime,
-  offerAmount) {
+  amnt) {
   try {
     //console.log(toString(parseFloat(_etherValue) ))
     const tx = await _contract.makeOffer(vaultId,
       percentage,
       _offerTime, {
-      value: ethers.utils.parseEther(offerAmount ) 
+      value: ethers.utils.parseEther(amnt ) 
     });
 
     console.log("Transaction hash:", tx.hash);

@@ -4,9 +4,13 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import TokenSalePage from './pages/TokenSalePage';
 import MyTokensPage from './pages/MyTokensPage';
 import NFTDetailsPage from './pages/NFTDetailsPage';
+import { RecoilRoot } from 'recoil';
 
 function App() {
   return (
+    <RecoilRoot>
+      
+    
     <Router>
       <div className="App">
         <Routes>
@@ -16,6 +20,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </RecoilRoot>
   );
 }
 
