@@ -1,29 +1,36 @@
 // src/pages/NFTDetailsPage.jsx
 import { ethers } from "ethers";
 import React, { useState, useEffect } from "react";
-import NFTDetails from "../components/NFTDetails";
 import { contractABI, contractAddress, nftAbi, tokenabi } from "../lib/data";
-import { getOwner, vaults, makeOffer_ } from "../lib/functions";
+import { getOwner, vaults, makeOffer_, acceptOffer } from "../lib/functions";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import {  iAtom } from "../atoms/state";
-import { balanceOf, getSellOffer, getTotalSellOffers } from "../lib/tokenFunc";
+import { iAtom } from "../atoms/state";
+import {
+  approve,
+  balanceOf,
+  getSellOffer,
+  getTotalSellOffers,
+  sellTokens,
+  vaultApproval,
+} from "../lib/tokenFunc";
 
 const MyTokensPage = () => {
   const navigate = useNavigate();
 
-  const [nft, setNFT] = useState(null);
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState();
   const [contract, setContract] = useState();
   const [i, setI] = useRecoilState(iAtom);
-  const [tcontract, setTContract] = useState();
-  const [tokenAddr, setTokenAddr] = useState("");
   const [balances, setBalances] = useState([]);
-  const [_NFTcontract, set_NFTcontract] = useState([]);
+  const [NFTcontract, setNFTcontract] = useState([]);
+  const [TOKENcontract, setTOKENcontract] = useState([]);
   const [nftArr, setNftArr] = useState([]);
-  const [atlas, setatlas] = useState([]);
-  
+  const [vaultdetails, setVaultdetails] = useState([]);
+  const [amount, setAmount] = useState();
+  const [price, setPrice] = useState();
+  const [val, setVal] = useState();
+  const [able, setAble] = useState(false);
 
   useEffect(() => {
     const loadProvider = async () => {
@@ -32,164 +39,271 @@ const MyTokensPage = () => {
           window.ethereum
         );
         setProvider(ethersProvider);
-        const x=await window.ethereum.request({ method: "eth_requestAccounts" });
-        const signers = ethersProvider.getSigner();
-        setSigner(signers);
-        // console.log(x)
+
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        const signer = ethersProvider.getSigner();
+        setSigner(signer);
+
         const _contract = new ethers.Contract(
           contractAddress,
           contractABI,
-          signers
+          signer
         );
         setContract(_contract);
 
-        const _Tcontract = new ethers.Contract(tokenAddr, tokenabi, signers);
-        setTContract(_Tcontract);
+        // Fetch vault data and NFTs
+        await fetchVaultsAndNFTs(_contract, signer, accounts[0]);
+      } else {
+        alert("MetaMask is not installed. Please install it to use this app.");
+      }
+    };
 
-        //fetch the total vaultcount for now we are hardcoding it to 1
+    const fetchVaultsAndNFTs = async (_contract, signer, userAddress) => {
+      try {
         const vaultCount = 4;
+        const vaultsARR = [];
+        const vaults = [];
 
-        //from vault counter fetching all vaults
-        let vaultsARR = [];
-        let NftAddrs = [];
         for (let i = 1; i <= vaultCount; i++) {
-          const vaultTX = await vaults(contract, i);
+          const vaultTX = await _contract.vaults(i);
           vaultsARR.push(vaultTX);
-          //console.log(vaultTX);
           let tempAADrs = {
             addr: vaultsARR[i - 1][0],
             tokenId: vaultsARR[i - 1][1].toNumber(),
-            tokenaddrs:vaultsARR[i-1][3]
+            tokenaddrs: vaultsARR[i - 1][3],
+            sellingState: vaultsARR[i - 1][4],
+            offerPrice: vaultsARR[i - 1][5],
+            offerTime: vaultsARR[i - 1][6],
+            offerPercentage: vaultsARR[i - 1][7],
+            offerBuyer: vaultsARR[i - 1][8],
+            totalAcceptedShares: vaultsARR[i - 1][9],
           };
-          NftAddrs.push(tempAADrs);
+          vaults.push(tempAADrs);
         }
-        // console.log(tempAADrs)
-
-        //console.log(NftAddrs);
+        setVaultdetails(vaults);
 
         const _NFTcontract = [];
         const _Tokencontract = [];
         const tokenURIS = [];
         const NFTS = [];
 
-        for (let i = 0; i < NftAddrs.length; i++) {
+        for (let i = 0; i < vaults.length; i++) {
           let tempContract = new ethers.Contract(
-            NftAddrs[i].addr,
+            vaults[i].addr,
             nftAbi,
-            signers
+            signer
           );
           _NFTcontract.push(tempContract);
 
-
-          let tempURI = await _NFTcontract[i].tokenURI(NftAddrs[i].tokenId);
+          let tempURI = await _NFTcontract[i].tokenURI(vaults[i].tokenId);
           tokenURIS.push(tempURI);
-          const res = await fetch(tokenURIS[i]);
+          const res = await fetch(tempURI);
           const tempNFT = await res.json();
-          NFTS.push({tempNFT:tempNFT,id:i});
+          NFTS.push({ tempNFT, id: i });
 
-          let temp=   new ethers.Contract(
-            NftAddrs[i].tokenaddrs,
+          let tempTokenContract = new ethers.Contract(
+            vaults[i].tokenaddrs,
             tokenabi,
-            signers
-          );       
-          _Tokencontract.push(temp)
+            signer
+          );
+          _Tokencontract.push(tempTokenContract);
         }
-        //console.log(tokenURIS);
+
         setNftArr(NFTS);
+        setTOKENcontract(_Tokencontract);
+        setNFTcontract(_NFTcontract);
 
-        
-
-
-
-
-
-        const totalbalances_=[]
-
+        // Fetch balances
+        const totalbalances = [];
         for (let i = 0; i < _Tokencontract.length; i++) {
-          let temp=await balanceOf(_Tokencontract[i],x[0])
-          
-          
-          totalbalances_.push(temp)
-          
+          const balance = await _Tokencontract[i].balanceOf(userAddress);
+          totalbalances.push(balance);
         }
 
-        console.log(balances)
-        console.log(balances[0],"jello")
-        setBalances(totalbalances_)
-        console.log((balances[nftArr[1].id]).eq(ethers.BigNumber.from(0)) )
-        setatlas([])
-        
-        
-
-
-        // console.log(nftArr);
-      } else {
-        alert("MetaMask is not installed. Please install it to use this app.");
+        setBalances(totalbalances);
+        console.log(totalbalances);
+        // Assuming this is required as a reset
+      } catch (error) {
+        console.error("Error fetching vaults or NFTs:", error);
       }
     };
 
     loadProvider();
-    // Fetch NFT details from the blockchain or backend
-    
   }, []);
 
-  
-
-  
-
   return (
-    <div >
-      <h1 className=" flex justify-center text-4xl font-extrabold">NFT Details</h1>
-      <div className=" grid grid-cols-3">
+    <div>
+      <h1 className="flex justify-center text-4xl font-extrabold">My NFTs</h1>
+      <div className="grid grid-cols-3">
+        {nftArr.length > 0 && balances.length > 0 ? (
+          nftArr.map((i, index) => {
+            const balance = balances[i.id];
 
-      
-      {
-      
-      
-      nftArr.map(function (i) {
-        console.log(balances[i.id])
-        // const booool=(balances[i.id]).eq(ethers.BigNumber.from(0)) 
-        if( !((balances[i.id]).eq(ethers.BigNumber.from(0)))) {
-          return (
-            <center>
-              <div className=" p-2 m-2 rounded-xl border border-black bg-zinc-200">
-                <div className=" m-2">
-                  <img
-                    style={{ width: `200px`, height: `200px` }}
-                    src={i.tempNFT.image}
-                    alt="img  here"
-                  />
-                </div>
-                <div className="nft-details">
-                  <div>
-                    <audio controls auoplay>
-                      <source
-                        src={i.tempNFT.animation_url}
-                        type="audio/mpeg"
+            // Check if balance and i.tempNFT exist to prevent undefined errors
+            if (balance && !balance.eq(ethers.BigNumber.from(0))) {
+              return (
+                <center key={index}>
+                  <div className="p-2 m-2 rounded-xl border border-black bg-zinc-100">
+                    <div className="my-2">
+                      <img
+                        className="rounded-2xl"
+                        style={{ width: `300px`, height: `300px` }}
+                        src={i.tempNFT.image}
+                        alt="NFT Image"
                       />
-                    </audio>
+                    </div>
+                    <div className="nft-details">
+                      <div>
+                        <audio
+                          controls
+                          className="border border-black rounded-3xl"
+                        >
+                          <source
+                            src={i.tempNFT.animation_url}
+                            type="audio/mpeg"
+                          />
+                        </audio>
+                      </div>
+                      <button
+                      // onClick={() => {
+                      //   setI(i);
+                      //   navigate(`/share-selling`);
+                      // }}
+                      >
+                        <h3 className="font-bold text-2xl">{i.tempNFT.name}</h3>
+                      </button>
+                      <p className="m-1">
+                        Description: {i.tempNFT.description}
+                      </p>
+                      <p className="m-1">Total Shares: 1250</p>
+                      <div className=" font-semibold text-lg">
+                        Your Balance: {ethers.utils.formatUnits(balance, 18)}
+                      </div>
+                      <input
+                        onChange={function (e) {
+                          setAmount(e.target.value);
+                        }}
+                        className="m-1 p-2 rounded-lg w-40 "
+                        type="number"
+                        placeholder="amount"
+                      />
+                      <input
+                        onChange={function (e) {
+                          setPrice(e.target.value);
+                        }}
+                        className="m-1 p-2  rounded-lg w-40"
+                        type="number"
+                        placeholder="price per share"
+                      />
+                      <button
+                        onClick={async function (j) {
+                          const tx = await sellTokens(
+                            TOKENcontract[i.id],
+                            amount,
+                            price
+                          );
+                        }}
+                        className="bg-white border m-1 border-black rounded-lg p-2 "
+                      >
+                        Sell Token
+                      </button>
+
+                      {(() => {
+                        // console.log(vaultdetails[i.id].sellingState)
+                        if (vaultdetails[i.id].sellingState == 1) {
+                          return (
+                            <div>
+                              <hr className="m-1 border border-slate-300" />
+                              <div>
+                                <div>
+                                  Offer Buyer: {vaultdetails[i.id].offerBuyer}
+                                </div>
+                                <div>
+                                  Offer price:{" "}
+                                  {ethers.utils.formatUnits(
+                                    vaultdetails[i.id].offerPrice.toString(),
+                                    18
+                                  )}{" "}
+                                </div>
+                                <div>
+                                  Offer Percentage: %
+                                  {vaultdetails[
+                                    i.id
+                                  ].offerPercentage.toString()}{" "}
+                                </div>
+                              </div>
+
+                              <input
+                                onChange={function (e) {
+                                  setVal(
+                                    (e.target.value * 10 ** 18).toString()
+                                  );
+                                }}
+                                className="m-1 p-2 rounded-lg w-40 "
+                                type="number"
+                                placeholder="amount of shares"
+                              />
+
+                              <button
+                                onClick={async function (j) {
+                                  console.log(i.id);
+                                  const tx = await approve(
+                                    TOKENcontract[i.id],
+                                    contractAddress,
+                                    val
+                                  );
+
+                                  console.log(tx);
+                                  if(tx){
+                                    setAble(true)
+                                  }
+                                }}
+                                className="bg-white border m-1 border-black rounded-lg p-2 "
+                              >
+                                Approve
+                              </button>
+                              <button 
+                                onClick={async function (j) {
+                                  if(able){
+                                    console.log(i.id+1);
+
+                                    const tx2 = await acceptOffer(
+                                      contract,
+                                      i.id+1,
+                                      val
+                                    );
+                                    console.log( tx2);
+                                  }else{
+                                    alert("first approve")
+                                  }
+                                  
+                                }}
+                                className="bg-white border m-1 border-black rounded-lg p-2 "
+                              >
+                                Accept offer
+                              </button>
+                            </div>
+                          );
+                        }
+                      })()}
+                    </div>
                   </div>
-                  <button onClick={function(j){
-                    setI(i)
-                    navigate(`/share-selling`)
-                  }}><h3 className="font-bold text-2xl">{i.tempNFT.name}</h3></button>
-                  <p className=" m-1 ">Description: {i.tempNFT.description}</p>
-                  <p className=" m-1">Total Shares: 1250</p>
-                  
-                  
-                </div>
-              </div>
-            </center>
-          );
-        }else{
-          return <div>
-            hello
-          </div>
-        }
-        
-      })}
+                </center>
+              );
+            } else {
+              // return (
+              //   <div key={index} className="flex justify-center items-center">
+              //     No Balance Available
+              //   </div>
+              // );
+            }
+          })
+        ) : (
+          <p>Loading NFT data...</p>
+        )}
       </div>
-     
     </div>
   );
 };
