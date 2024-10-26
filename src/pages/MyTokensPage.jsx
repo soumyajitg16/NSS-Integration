@@ -228,10 +228,10 @@ const MyTokensPage = () => {
                                   )}{" "}
                                 </div>
                                 <div>
-                                  Offer Percentage: %
+                                  Offer Percentage: {" "}
                                   {vaultdetails[
                                     i.id
-                                  ].offerPercentage.toString()}{" "}
+                                  ].offerPercentage.toString()}%
                                 </div>
                               </div>
 
