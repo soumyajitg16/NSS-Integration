@@ -2,6 +2,16 @@ import { ethers } from "ethers";
 
 
 
+export async function approve(
+    _contract,  
+    _spender,    
+    _value        
+  ) {
+    const tx = await _contract.approve(_spender, _value);
+    
+    return tx;
+  }
+  
 export async function vaultApproval(
     _contract,  
     _spender,    
@@ -17,7 +27,7 @@ export async function vaultApproval(
     _amount,     // The amount of tokens to sell
     _price       // The price per token in Wei
   ) {
-    const tx = await _contract.sellTokens(_amount, _price);
+    const tx = await _contract.sellTokens((10**18*_amount).toString(),(10**18* _price).toString());
     const receipt = await tx.wait();
     return receipt;
   }

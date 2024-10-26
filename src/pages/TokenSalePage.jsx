@@ -95,39 +95,57 @@ const TokenSalePage = () => {
   return (
     <center>
       <div>
-      <div className="text-4xl font-bold">Name:{tname}</div>
-      <div className="text-4xl font-bold">Symbol: {tsymbol} </div>
-      <div className="grid grid-cols-3">
-        {getSellOffers.map(function (i) {
-          return (
-            <div className=" m-2 p-1 bg-slate-50 border border-slate-900 rounded-md ">
-              <div className="text-xl font-medium">
+        <div className="bg-slate-100  pb-2">
+          <div className="text-4xl m-2 font-bold">Name: {tname}</div>
+          <div className="text-4xl m-2 font-bold">Symbol: {tsymbol} </div>
+        </div>
+
+        <div className="grid grid-cols-3">
+          {getSellOffers.map(function (i) {
+            return (
+              <div className=" m-2 p-1 bg-slate-100 border border-slate-900 rounded-md ">
+                <div className="text-lg font-medium">
+                <div className="m-2 text-lg bg-white ">Seller Address: {i[0]}</div>
+                  <div className="m-2">
+                    Price Per Share: {ethers.utils.formatEther(i[2])} Matic
+                  </div>
+                 
+                  <div>
+                    Available share for sellout:{" "}
+                    {ethers.utils.formatEther(i[1])}
+                  </div>
+                </div>
                 <div className="m-2">
-                  price per share: {ethers.utils.formatEther(i[2])} Matic
+                  <input
+                    className=" p-2 m-3 bg-white "
+                    type="number"
+                    placeholder="Shares to buy"
+                    onChange={function (e) {
+                      setShareAmnt(e.target.value);
+                    }}
+                  />
+
+                  <button
+                    className="p-2 m-1 bg-red-700 text-white rounded-md"
+                    onClick={async function (j) {
+                      const tx = await buyTokens(
+                        tcontract,
+                        i[0],
+                        shareAmnt,
+                        i[2]
+                      );
+                      console.log(tx);
+                    }}
+                  >
+                    BuyToken
+                  </button>
                 </div>
-                <div className="m-2">seller address: {i[0]}</div>
-                <div>
-                  Available share for sellout: {ethers.utils.formatEther(i[1])}
-                </div>
-              </div >
-              <div className="m-2">
-                <input className=" p-2 bg-slate-200 " type="number" placeholder="Shares to buy" onChange={function(e){
-                  setShareAmnt(e.target.value)
-                }} />
               </div>
-              <div>
-                <button className="p-2 m-1 bg-red-700 text-white rounded-md" onClick={async function(j){
-                  const tx=await buyTokens(tcontract,i[0],shareAmnt,i[2])
-                  console.log(tx)
-                }}>BuyToken</button>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
     </center>
-    
   );
 };
 
