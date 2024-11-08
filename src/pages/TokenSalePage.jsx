@@ -105,12 +105,12 @@ const TokenSalePage = () => {
             return (
               <div className=" m-2 p-1 bg-slate-100 border border-slate-900 rounded-md ">
                 <div className="text-lg font-medium">
-                <div className="m-2 text-lg bg-white ">Seller Address: {i[0]}</div>
-                  <div className="m-2">
+                <div className="m-2 font-bold text-lg bg-white "> Seller Address:  <div className=" font-medium text-sm" >{i[0]}</div> </div>
+                  <div className="m-2 font-semibold text-lg">
                     Price Per Share: {ethers.utils.formatEther(i[2])} Matic
                   </div>
                  
-                  <div>
+                  <div className="m-2 font-semibold text-lg">
                     Available share for sellout:{" "}
                     {ethers.utils.formatEther(i[1])}
                   </div>
