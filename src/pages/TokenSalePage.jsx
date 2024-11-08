@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import React, { useState, useEffect } from "react";
 import NFTDetails from "../components/NFTDetails";
 import { contractABI, contractAddress, nftAbi, tokenabi } from "../lib/data";
-import { getOwner, vaults, makeOffer_ } from "../lib/functions";
+import { getOwner, vaults, makeOffer_, vaultCounter } from "../lib/functions";
 import {
   buyTokens,
   getSellOffer,
@@ -46,13 +46,13 @@ const TokenSalePage = () => {
         setContract(_contract);
 
         //fetch the total vaultcount for now we are hardcoding it to 1
-        const vaultCount = 4;
+        const vaultCount = await vaultCounter(_contract);
 
         //from vault counter fetching all vaults
         let vaultsARR = [];
         let NftAddrs = [];
         for (let i = 1; i <= vaultCount; i++) {
-          const vaultTX = await vaults(contract, i);
+          const vaultTX = await vaults(_contract, i);
           vaultsARR.push(vaultTX);
           // console.log(vaultTX);
           let tempAADrs = {
