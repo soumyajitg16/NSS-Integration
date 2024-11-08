@@ -52,7 +52,7 @@ const TokenSalePage = () => {
         let vaultsARR = [];
         let NftAddrs = [];
         for (let i = 1; i <= vaultCount; i++) {
-          const vaultTX = await vaults(contract, i);
+          const vaultTX = await vaults(_contract, i);
           vaultsARR.push(vaultTX);
           // console.log(vaultTX);
           let tempAADrs = {

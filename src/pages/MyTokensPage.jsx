@@ -2,7 +2,7 @@
 import { ethers } from "ethers";
 import React, { useState, useEffect } from "react";
 import { contractABI, contractAddress, nftAbi, tokenabi } from "../lib/data";
-import { getOwner, vaults, makeOffer_, acceptOffer } from "../lib/functions";
+import { getOwner, vaults, makeOffer_, acceptOffer, vaultCounter } from "../lib/functions";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { iAtom } from "../atoms/state";
@@ -62,7 +62,7 @@ const MyTokensPage = () => {
 
     const fetchVaultsAndNFTs = async (_contract, signer, userAddress) => {
       try {
-        const vaultCount = 4;
+        const vaultCount = await vaultCounter(_contract);
         const vaultsARR = [];
         const vaults = [];
 
@@ -76,9 +76,9 @@ const MyTokensPage = () => {
             sellingState: vaultsARR[i - 1][4],
             offerPrice: vaultsARR[i - 1][5],
             offerTime: vaultsARR[i - 1][6],
-            offerPercentage: vaultsARR[i - 1][7],
-            offerBuyer: vaultsARR[i - 1][8],
-            totalAcceptedShares: vaultsARR[i - 1][9],
+            // offerPercentage: vaultsARR[i - 1][7],
+            offerBuyer: vaultsARR[i - 1][7],
+            totalAcceptedShares: vaultsARR[i - 1][8],
           };
           vaults.push(tempAADrs);
         }
@@ -227,18 +227,18 @@ const MyTokensPage = () => {
                                     18
                                   )}{" "}
                                 </div>
-                                <div>
+                                {/* <div>
                                   Offer Percentage: %
                                   {vaultdetails[
                                     i.id
                                   ].offerPercentage.toString()}{" "}
-                                </div>
+                                </div> */}
                               </div>
 
                               <input
                                 onChange={function (e) {
                                   setVal(
-                                    (e.target.value * 10 ** 18).toString()
+                                    (e.target.value)
                                   );
                                 }}
                                 className="m-1 p-2 rounded-lg w-40 "

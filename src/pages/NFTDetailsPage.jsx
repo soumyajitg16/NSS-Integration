@@ -3,10 +3,10 @@ import { ethers } from "ethers";
 import React, { useState, useEffect } from "react";
 import NFTDetails from "../components/NFTDetails";
 import { contractABI, contractAddress, nftAbi, tokenabi } from "../lib/data";
-import { getOwner, vaults, makeOffer_ } from "../lib/functions";
+import { getOwner, vaults, makeOffer_, createVault, vaultCounter } from "../lib/functions";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import {  iAtom } from "../atoms/state";
+import { iAtom } from "../atoms/state";
 
 const NFTDetailsPage = () => {
   const navigate = useNavigate();
@@ -44,17 +44,25 @@ const NFTDetailsPage = () => {
         );
         setContract(_contract);
 
+        //const v=await createVault(_contract,'new','new','0xF6AdB774f30bdFDd8B8Bcbbc8c520cef85d91c93',2)
+        //console.log(v)
+
+
+
+
+
         const _Tcontract = new ethers.Contract(tokenAddr, tokenabi, signers);
         setTContract(_Tcontract);
 
         //fetch the total vaultcount for now we are hardcoding it to 1
-        const vaultCount = 4;
+        const vaultCount = await vaultCounter(_contract);
+        console.log(vaultCount)
 
         //from vault counter fetching all vaults
         let vaultsARR = [];
         let NftAddrs = [];
         for (let i = 1; i <= vaultCount; i++) {
-          const vaultTX = await vaults(contract, i);
+          const vaultTX = await vaults(_contract, i);
           vaultsARR.push(vaultTX);
           console.log(vaultTX);
           let tempAADrs = {
@@ -94,98 +102,102 @@ const NFTDetailsPage = () => {
 
     loadProvider();
     // Fetch NFT details from the blockchain or backend
-    
   }, []);
 
   async function handleOffer() {
-    let totalamt = 1250 * offerAmount * (percentage / 100);
-    // setTtlamnt(totalamt)
+    let totalamt = 1250 * offerAmount ;
+    //setTtlamnt(totalamt)
 
     console.log(time);
-    const tx = await makeOffer_(
-      contract,
-      1,
-      percentage,
-      time,
-      totalamt.toString()
-    );
+    const tx = await makeOffer_(contract, 1, time, totalamt);
     console.log(tx);
   }
 
-  
-
   return (
-    <div >
-      <h1 className=" flex justify-center text-4xl font-extrabold">NFT Details</h1>
+    <div>
+      <h1 className=" flex justify-center text-4xl font-extrabold">
+        NFT Details
+      </h1>
       <div className=" grid grid-cols-3">
-
-      
-      {nftArr.map(function (i) {
-        return (
-          <center>
-            <div className=" p-2 m-2 rounded-xl border border-black bg-zinc-200">
-              <div className=" m-2">
-                <img
-                  style={{ width: `200px`, height: `200px` }}
-                  src={i.image}
-                  alt="img  here"
-                />
-              </div>
-              <div className="nft-details">
-                <div>
-                  <audio controls auoplay>
-                    <source
-                      src={i.animation_url}
-                      type="audio/mpeg"
-                    />
-                  </audio>
+        {( nftArr.length > 0) ?(nftArr.map(function (i) {
+          return (
+            <center>
+              <div className=" p-2 m-2 rounded-xl border border-black bg-zinc-200">
+                <div className=" m-2">
+                  <img
+                    style={{ width: `200px`, height: `200px` }}
+                    src={i.image}
+                    alt="img  here"
+                  />
                 </div>
-                <button onClick={function(j){
-                  setI(i)
-                  navigate(`/share-selling`)
-                }}><h3 className="font-bold text-2xl">{i.name}</h3></button>
-                <p className=" m-1 ">Description: {i.description}</p>
-                <p className=" m-1">Total Shares: 1250</p>
-                <p className=" m-1 text-red-500">Total amount to be paid: {ttlamnt}</p>
-                <input className="m-1 p-1 rounded-md"
-                  type="number"
-                  placeholder="Offer % Shares"
-                  onChange={(e) => setpercentage(e.target.value)}
-                />
-                <input className="m-1 rounded-md p-1"
-                  type="number"
-                  placeholder="Time in timestamp"
-                  onChange={(e) => setTime(e.target.value)}
-                />
-                <input className="m-1 p-1 rounded-md"
-                  type="number"
-                  placeholder="Matic per share"
-                  onChange={(e) => {
-                    const x = e.target.value;
-                    setOfferAmount(x);
-                  }}
-                />
-                <button
-                  className=" p-2 bg-zinc-100 rounded-sm m-2"
-                  onClick={function (i) {
-                    let totalamt = 1250 * offerAmount * (percentage / 100);
-                    console.log(totalamt);
-                    setTtlamnt(totalamt);
-                  }}
-                >
-                  Calculate
-                </button>
-                <button
-                  className=" p-2 bg-red-700 text-white rounded-sm m-2"
-                  onClick={handleOffer}
-                >
-                  Make Offer
-                </button>
+                <div className="nft-details">
+                  <div>
+                    <audio controls auoplay>
+                      <source src={i.animation_url} type="audio/mpeg" />
+                    </audio>
+                  </div>
+                  <button
+                    onClick={function (j) {
+                      setI(i);
+                      navigate(`/share-selling`);
+                    }}
+                  >
+                    <h3 className="font-bold text-2xl">{i.name}</h3>
+                  </button>
+                  <p className=" m-1 ">Description: {i.description}</p>
+                  <p className=" m-1">Total Shares: 1250</p>
+                  <p className=" m-1 text-red-500">
+                    Total amount to be paid: {ttlamnt}
+                  </p>
+                  {/* <input
+                    className="m-1 p-1 rounded-md"
+                    type="number"
+                    placeholder="Offer % Shares"
+                    onChange={(e) => setpercentage(e.target.value)}
+                  /> */}
+                  <input
+                    className="m-1 rounded-md p-1"
+                    type="number"
+                    placeholder="Time in timestamp"
+                    onChange={(e) => setTime(e.target.value)}
+                  />
+                  <input
+                    className="m-1 p-1 rounded-md"
+                    type="number"
+                    placeholder="Matic per share"
+                    onChange={(e) => {
+                      const x = e.target.value;
+                      setOfferAmount(x);
+                    }}
+                  />
+                  <button
+                    className=" p-2 bg-zinc-100 rounded-sm m-2"
+                    onClick={function (i) {
+                      let totalamt = 1250 * offerAmount ;
+                      console.log(totalamt);
+                      setTtlamnt(totalamt);
+                    }}
+                  >
+                    Calculate
+                  </button>
+                  <button
+                    className=" p-2 bg-red-700 text-white rounded-sm m-2"
+                    onClick={handleOffer}
+                  >
+                    Make Offer
+                  </button>
+                </div>
               </div>
-            </div>
-          </center>
-        );
-      })}
+            </center>
+          );
+        })):(
+          <p>loading.....</p>
+        )
+        
+        
+        
+        
+        }
       </div>
       {/* <NFTDetails nft={nft} onOffer={handleOffer} /> */}
     </div>

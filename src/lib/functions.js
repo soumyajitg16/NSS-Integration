@@ -1,5 +1,14 @@
 import { ethers } from "ethers";
 
+/**
+ * Creates a new vault in the contract.
+ * @param {Object} _contract - The contract instance.
+ * @param {string} _name - The name of the vault.
+ * @param {string} _symbol - The symbol for the vault.
+ * @param {string} _collection - The address of the ERC721 collection.
+ * @param {number} _tokenId - The token ID within the collection to be vaulted.
+ * @returns {Promise<Object>} The transaction result of vault creation.
+ */
 export async function createVault(
   _contract,
   _name,
@@ -16,99 +25,129 @@ export async function createVault(
   return vault;
 }
 
-export async function acceptOffer(_contract,_vaultId,_amntOfShares) {
-  const ao=_contract.acceptOffer(_vaultId,_amntOfShares);
+/**
+ * Accepts an offer on a specified vault.
+ * @param {Object} _contract - The contract instance.
+ * @param {number} _vaultId - The ID of the vault.
+ * @param {number} _amntOfShares - The amount of shares to accept in the offer.
+ * @returns {Promise<Object>} The transaction result of accepting the offer.
+ */
+export async function acceptOffer(_contract, _vaultId, _amntOfShares) {
+
+  const ao = _contract.acceptOffer(_vaultId,( _amntOfShares*10**18).toString());
   return ao;
 }
+
+/**
+ * Ends an active offer on a specified vault.
+ * @param {Object} _contract - The contract instance.
+ * @param {number} _vaultId - The ID of the vault.
+ * @returns {Promise<Object>} The transaction result of ending the offer.
+ */
 export async function endOffer(_contract, _vaultId) {
-  const ao=_contract.endOffer(_vaultId);
+  const ao = _contract.endOffer(_vaultId);
   return ao;
 }
-export async function onERC721Received(_contract,_addr,_addr_uint,_bytes) {
-  const ao=_contract.onERC721Received(_addr,_addr_uint,_bytes);
+
+/**
+ * Handles ERC721 token transfers to the contract.
+ * @param {Object} _contract - The contract instance.
+ * @param {string} _addr - The address of the sender.
+ * @param {number} _addr_uint - The token ID.
+ * @param {string} _bytes - Additional data sent with the transfer.
+ * @returns {Promise<Object>} The result of the onERC721Received function.
+ */
+export async function onERC721Received(_contract, _addr, _addr_uint, _bytes) {
+  const ao = _contract.onERC721Received(_addr, _addr_uint, _bytes);
   return ao;
 }
-export async function transferOwnership(_contract,_addr,) {
-  const ao=_contract.transferOwnership(_addr);
+
+/**
+ * Transfers contract ownership to a new address.
+ * @param {Object} _contract - The contract instance.
+ * @param {string} _addr - The new owner's address.
+ * @returns {Promise<Object>} The transaction result of the ownership transfer.
+ */
+export async function transferOwnership(_contract, _addr) {
+  const ao = _contract.transferOwnership(_addr);
   return ao;
 }
+
+/**
+ * Retrieves information about a specific vault.
+ * @param {Object} _contract - The contract instance.
+ * @param {number} _vaultId - The ID of the vault.
+ * @returns {Promise<Object>} The vault information, including details like name, symbol, and state.
+ */
 export async function getVaultInfo(_contract, _vaultId) {
-  const vault = await _contract.getVaultInfo(_vaultId);
-  return vault;
+  const v = await _contract.getVaultInfo(_vaultId);
+  return v;
+}
+export async function vaultCounter(_contract) {
+  const v = await _contract.vaultCounter();
+  return v;
 }
 
-
-
-
-/*0:
-string: name totaleclipse
-1:
-string: symbol tec
-2:
-address: collection 0x20Ed8A5D17667F86A90F503044e04C9A689e4Ca5
-3:
-uint256: tokenId 1
-4:
-address: owner 0x2810c698cA6257AF8a2F9d6eB874BC61B4fc1fe2
-5:
-address: fractionalTokenAddress 0xD2c70DDec21d09e2Abc0Bf849C684473Ef5c59b7
-6:
-uint8: sellingState 0
-7:
-uint256: offerPrice 0
-8:
-uint256: offerTime 0
-9:
-uint256: offerPercentage 0
-10:
-address: offerBuyer 0x0000000000000000000000000000000000000000
-11:
-uint256: totalAcceptedShares 0 */
+/**
+ * Gets the vault details for a specified ID directly.
+ * @param {Object} _contract - The contract instance.
+ * @param {number} _vaultId - The ID of the vault.
+ * @returns {Promise<Object>} The vault details as stored on the contract.
+ */
 export async function vaults(_contract, _vaultId) {
   const vault = await _contract.vaults(_vaultId);
   return vault;
 }
+
+/**
+ * Retrieves the current owner of the contract.
+ * @param {Object} _contract - The contract instance.
+ * @returns {Promise<string>} The address of the contract owner.
+ */
 export async function getOwner(_contract) {
   const owner = await _contract.owner();
   return owner;
 }
+
+/**
+ * Gets the royalty percentage set on the contract.
+ * @param {Object} _contract - The contract instance.
+ * @returns {Promise<number>} The royalty percentage value.
+ */
 export async function royaltyPercentage(_contract) {
   const rp = await _contract.royaltyPercentage();
   return rp;
 }
 
-export async function makeOffer(
+
+
+/**
+ * Makes an offer with a specified amount in ether.
+ * @param {Object} _contract - The contract instance.
+ * @param {number} vaultId - The ID of the vault.
+ * @param {number} percentage - The percentage of shares being offered.
+ * @param {number} _offerTime - The duration of the offer.
+ * @param {string} amnt - The offer amount in ether as a string (will be converted to wei).
+ * @returns {Promise<Object>} The transaction receipt of the offer.
+ */
+export async function makeOffer_(
   _contract,
   vaultId,
-  percentage,
+  // percentage,
   _offerTime,
-  offerAmount //shold be in string 
+  amnt
 ) {
-  const offer = await _contract.makeOffer(vaultId, percentage, _offerTime, {
-    value: offerAmount, 
-  });
-  return offer;
-}
-export async function makeOffer_(_contract,
-  vaultId,
-  percentage,
-  _offerTime,
-  amnt) {
   try {
-    //console.log(toString(parseFloat(_etherValue) ))
-    const tx = await _contract.makeOffer(vaultId,
-      percentage,
-      _offerTime, {
-      value: ethers.utils.parseEther(amnt ) 
+    const ttl=( amnt ).toString();
+    const tx = await _contract.makeOffer(vaultId, _offerTime, {
+      value: ethers.utils.parseEther(ttl),
     });
 
     console.log("Transaction hash:", tx.hash);
-
-    
     const receipt = await tx.wait();
     console.log("Transaction confirmed:", receipt);
-    return receipt
+    return receipt;
   } catch (error) {
-    console.error("Error purchasing vault:", error);
+    console.error("Error making offer:", error);
   }
 }
