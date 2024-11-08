@@ -1,4 +1,6 @@
-export const contractAddress = "0xbaaf22462bbc65611A8C62D0f2d4Ee3b4E37C2eE"; // Replace with your contract address
+export const contractAddress = "0xbaaf22462bbc65611A8C62D0f2d4Ee3b4E37C2eE"; 
+const erc721nftaddr='0xF6AdB774f30bdFDd8B8Bcbbc8c520cef85d91c93';
+// Replace with your contract address
 export const contractABI = [
     {
         "inputs": [],

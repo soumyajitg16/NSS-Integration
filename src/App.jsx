@@ -5,6 +5,7 @@ import TokenSalePage from './pages/TokenSalePage';
 import MyTokensPage from './pages/MyTokensPage';
 import NFTDetailsPage from './pages/NFTDetailsPage';
 import { RecoilRoot } from 'recoil';
+import Admin from './pages/admin';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/share-selling" element={<TokenSalePage />} />
           <Route path="/my-tokens" element={<MyTokensPage />} />
           <Route path="/" element={<NFTDetailsPage />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </div>
     </Router>

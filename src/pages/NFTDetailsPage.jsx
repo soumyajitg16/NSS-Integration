@@ -122,7 +122,7 @@ const NFTDetailsPage = () => {
         {( nftArr.length > 0) ?(nftArr.map(function (i) {
           return (
             <center>
-              <div className=" p-2 m-2 rounded-xl border border-black bg-zinc-200">
+              <div className=" p-2 m-2 rounded-xl border border-black bg-zinc-100">
                 <div className=" m-2">
                   <img
                     style={{ width: `200px`, height: `200px` }}
