@@ -154,3 +154,7 @@ export async function allowance(_contract, _addr, _spender) {
   const tx = await _contract.allowance(_addr, _spender);
   return tx;
 }
+export async function transfer(_contract, _addr, _val) {
+  const tx = await _contract.transfer(_addr, (_val*10**18).toString());
+  return tx;
+}

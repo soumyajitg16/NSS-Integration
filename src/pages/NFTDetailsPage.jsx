@@ -115,7 +115,7 @@ const NFTDetailsPage = () => {
 
   return (
     <div>
-      <h1 className=" flex justify-center text-4xl font-extrabold">
+      <h1 className=" flex justify-center text-4xl font-extrabold p-3">
         NFT Details
       </h1>
       <div className=" grid grid-cols-3">
