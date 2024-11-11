@@ -13,6 +13,7 @@ import {
 } from "../lib/tokenFunc";
 import { useRecoilState } from "recoil";
 import { iAtom } from "../atoms/state";
+import Navbar from "../components/navbar";
 
 const TokenSalePage = () => {
   // const [i, setI] = useRecoilState(iAtom);
@@ -94,6 +95,7 @@ const TokenSalePage = () => {
 
   return (
     <center>
+      <Navbar></Navbar>
       <div>
         <div className="bg-slate-100  pb-2">
           <div className="text-4xl m-2 font-bold">Name: {tname}</div>

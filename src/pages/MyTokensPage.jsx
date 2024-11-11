@@ -21,6 +21,7 @@ import {
   transfer,
   vaultApproval,
 } from "../lib/tokenFunc";
+import Navbar from "../components/navbar";
 
 const MyTokensPage = () => {
   const navigate = useNavigate();
@@ -145,6 +146,8 @@ const MyTokensPage = () => {
 
   return (
     <div>
+      <Navbar></Navbar>
+
       <h1 className="flex justify-center text-4xl font-extrabold">My NFTs</h1>
       <div className="grid grid-cols-3">
         {nftArr.length > 0 && balances.length > 0 ? (

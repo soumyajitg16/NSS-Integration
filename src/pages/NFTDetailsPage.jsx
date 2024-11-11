@@ -7,6 +7,7 @@ import { getOwner, vaults, makeOffer_, createVault, vaultCounter } from "../lib/
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { iAtom } from "../atoms/state";
+import Navbar from "../components/navbar";
 
 const NFTDetailsPage = () => {
   const navigate = useNavigate();
@@ -115,6 +116,7 @@ const NFTDetailsPage = () => {
 
   return (
     <div>
+      <Navbar></Navbar>
       <h1 className=" flex justify-center text-4xl font-extrabold p-3">
         NFT Details
       </h1>
