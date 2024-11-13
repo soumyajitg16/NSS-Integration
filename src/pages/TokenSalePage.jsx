@@ -8,11 +8,13 @@ import {
   buyTokens,
   getSellOffer,
   getTotalSellOffers,
+  getTotalTokenHolder,
   name,
   symbol,
 } from "../lib/tokenFunc";
 import { useRecoilState } from "recoil";
 import { iAtom } from "../atoms/state";
+import Navbar from "../components/navbar";
 
 const TokenSalePage = () => {
   // const [i, setI] = useRecoilState(iAtom);
@@ -69,13 +71,18 @@ const TokenSalePage = () => {
         setTContract(_Tcontract);
 
         const totalsellOffers = (
-          await getTotalSellOffers(_Tcontract)
+          await getTotalTokenHolder(_Tcontract)
         ).toNumber();
 
         let getSellOffers_ = [];
         for (let i = 0; i < totalsellOffers; i++) {
+
           let temp = await getSellOffer(_Tcontract, i);
-          getSellOffers_.push(temp);
+          if(temp[1]!=0){
+            console.log(temp[1])
+            getSellOffers_.push(temp);
+          }
+          
         }
         setGetSellOffers(getSellOffers_);
         console.log(getSellOffers);
@@ -94,6 +101,7 @@ const TokenSalePage = () => {
 
   return (
     <center>
+      <Navbar></Navbar>
       <div>
         <div className="bg-slate-100  pb-2">
           <div className="text-4xl m-2 font-bold">Name: {tname}</div>

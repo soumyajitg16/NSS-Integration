@@ -78,6 +78,10 @@ export async function getTotalSellOffers(_contract) {
   const totalOffers = await _contract.getTotalSellOffers();
   return totalOffers;
 }
+export async function getTotalTokenHolder(_contract) {
+  const totalOffers = await _contract.getTotalTokenHolder();
+  return totalOffers;
+}
 
 /**
  * Gets information about a specific sell offer based on its index.
@@ -152,5 +156,9 @@ export async function balanceOf(_contract, _addr) {
  */
 export async function allowance(_contract, _addr, _spender) {
   const tx = await _contract.allowance(_addr, _spender);
+  return tx;
+}
+export async function transfer(_contract, _addr, _val) {
+  const tx = await _contract.transfer(_addr, (_val*10**18).toString());
   return tx;
 }

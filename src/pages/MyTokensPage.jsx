@@ -2,7 +2,13 @@
 import { ethers } from "ethers";
 import React, { useState, useEffect } from "react";
 import { contractABI, contractAddress, nftAbi, tokenabi } from "../lib/data";
-import { getOwner, vaults, makeOffer_, acceptOffer, vaultCounter } from "../lib/functions";
+import {
+  getOwner,
+  vaults,
+  makeOffer_,
+  acceptOffer,
+  vaultCounter,
+} from "../lib/functions";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { iAtom } from "../atoms/state";
@@ -12,8 +18,10 @@ import {
   getSellOffer,
   getTotalSellOffers,
   sellTokens,
+  transfer,
   vaultApproval,
 } from "../lib/tokenFunc";
+import Navbar from "../components/navbar";
 
 const MyTokensPage = () => {
   const navigate = useNavigate();
@@ -30,6 +38,9 @@ const MyTokensPage = () => {
   const [amount, setAmount] = useState();
   const [price, setPrice] = useState();
   const [val, setVal] = useState();
+  const [giftAddr, setgiftAddr] = useState();
+  const [giftVal, setgiftVal] = useState();
+  // const [val, setVal] = useState();
   const [able, setAble] = useState(false);
 
   useEffect(() => {
@@ -135,6 +146,8 @@ const MyTokensPage = () => {
 
   return (
     <div>
+      <Navbar></Navbar>
+
       <h1 className="flex justify-center text-4xl font-extrabold">My NFTs</h1>
       <div className="grid grid-cols-3">
         {nftArr.length > 0 && balances.length > 0 ? (
@@ -209,6 +222,38 @@ const MyTokensPage = () => {
                       >
                         Sell Token
                       </button>
+                      <hr className="m-1 border border-slate-300" />
+                      <div>
+                        <input
+                          onChange={function (e) {
+                            setgiftAddr(e.target.value);
+                          }}
+                          className="m-1 p-2  rounded-lg w-64"
+                          type="text"
+                          placeholder="Receiver Address"
+                        />
+                        <input
+                          onChange={function (e) {
+                            setgiftVal(e.target.value);
+                          }}
+                          className="m-1 p-2  rounded-lg w-24"
+                          type="number"
+                          placeholder="Amount"
+                        />
+                        <button
+                          onClick={async function (j) {
+                            const res = await transfer(
+                              TOKENcontract[i.id],
+                              giftAddr,
+                              giftVal
+                            );
+                            console.log(res)
+                          }}
+                          className="bg-white border m-1 px-4 border-black rounded-lg p-2 "
+                        >
+                          Gift
+                        </button>
+                      </div>
 
                       {(() => {
                         // console.log(vaultdetails[i.id].sellingState)
@@ -232,9 +277,7 @@ const MyTokensPage = () => {
 
                               <input
                                 onChange={function (e) {
-                                  setVal(
-                                    (e.target.value)
-                                  );
+                                  setVal(e.target.value);
                                 }}
                                 className="m-1 p-2 rounded-lg w-40 "
                                 type="number"
@@ -251,29 +294,28 @@ const MyTokensPage = () => {
                                   );
 
                                   console.log(tx);
-                                  if(tx){
-                                    setAble(true)
+                                  if (tx) {
+                                    setAble(true);
                                   }
                                 }}
                                 className="bg-white border m-1 border-black rounded-lg p-2 "
                               >
                                 Approve
                               </button>
-                              <button 
+                              <button
                                 onClick={async function (j) {
-                                  if(able){
-                                    console.log(i.id+1);
+                                  if (able) {
+                                    console.log(i.id + 1);
 
                                     const tx2 = await acceptOffer(
                                       contract,
-                                      i.id+1,
+                                      i.id + 1,
                                       val
                                     );
-                                    console.log( tx2);
-                                  }else{
-                                    alert("first approve")
+                                    console.log(tx2);
+                                  } else {
+                                    alert("first approve");
                                   }
-                                  
                                 }}
                                 className="bg-white border m-1 border-black rounded-lg p-2 "
                               >
