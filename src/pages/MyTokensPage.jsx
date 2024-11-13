@@ -15,8 +15,11 @@ import { iAtom } from "../atoms/state";
 import {
   approve,
   balanceOf,
+  cancelSellOffer,
   getSellOffer,
   getTotalSellOffers,
+  getTotalTokenHolder,
+  sellOffers,
   sellTokens,
   transfer,
   vaultApproval,
@@ -31,6 +34,7 @@ const MyTokensPage = () => {
   const [contract, setContract] = useState();
   const [i, setI] = useRecoilState(iAtom);
   const [balances, setBalances] = useState([]);
+  const [sOffers, setSOffers] = useState([]);
   const [NFTcontract, setNFTcontract] = useState([]);
   const [TOKENcontract, setTOKENcontract] = useState([]);
   const [nftArr, setNftArr] = useState([]);
@@ -128,11 +132,16 @@ const MyTokensPage = () => {
 
         // Fetch balances
         const totalbalances = [];
+        const totalTokenHolders=[]
+        const sellOffer = [];
         for (let i = 0; i < _Tokencontract.length; i++) {
           const balance = await _Tokencontract[i].balanceOf(userAddress);
+          const _sellOffers=await(sellOffers(_Tokencontract[i],userAddress))
+          sellOffer.push(_sellOffers)
           totalbalances.push(balance);
         }
 
+        setSOffers(sellOffer)
         setBalances(totalbalances);
         console.log(totalbalances);
         // Assuming this is required as a reset
@@ -153,9 +162,10 @@ const MyTokensPage = () => {
         {nftArr.length > 0 && balances.length > 0 ? (
           nftArr.map((i, index) => {
             const balance = balances[i.id];
+            const sellOFF = sOffers[i.id];
 
             // Check if balance and i.tempNFT exist to prevent undefined errors
-            if (balance && !balance.eq(ethers.BigNumber.from(0))) {
+            if ((balance && !balance.eq(ethers.BigNumber.from(0)))|| (sellOFF &&sellOFF.amount!=0)) {
               return (
                 <center key={index}>
                   <div className="p-2 m-2 rounded-xl border border-black bg-zinc-100">
@@ -192,7 +202,7 @@ const MyTokensPage = () => {
                       </p>
                       <p className="m-1">Total Shares: 1250</p>
                       <div className=" font-semibold text-lg">
-                        Your Balance: {ethers.utils.formatUnits(balance, 18)}
+                        Your Balance: { (sellOFF.amount==0)  ?  ethers.utils.formatUnits(balance, 18):ethers.utils.formatUnits(balance, 18)+" - Sales Active "}
                       </div>
                       <input
                         onChange={function (e) {
@@ -222,6 +232,20 @@ const MyTokensPage = () => {
                       >
                         Sell Token
                       </button>
+                      {(() => {
+                        // console.log(vaultdetails[i.id].sellingState)
+                        if (sellOFF.amount!=0) {
+                          return (
+                            <div>
+                              <button onClick={async function (j) {
+                                 const tx = await cancelSellOffer(
+                                  TOKENcontract[i.id] );
+                              }} className="bg-white border m-1 px-4 border-black rounded-lg p-2 ">Cancel Sell Offer</button>
+                            
+                            </div>
+                          );
+                        }
+                      })()}
                       <hr className="m-1 border border-slate-300" />
                       <div>
                         <input
@@ -255,6 +279,7 @@ const MyTokensPage = () => {
                         </button>
                       </div>
 
+                      
                       {(() => {
                         // console.log(vaultdetails[i.id].sellingState)
                         if (vaultdetails[i.id].sellingState == 1) {

@@ -6,6 +6,7 @@ import { contractABI, contractAddress, nftAbi, tokenabi } from "../lib/data";
 import { getOwner, vaults, makeOffer_, vaultCounter } from "../lib/functions";
 import {
   buyTokens,
+  cancelSellOffer,
   getSellOffer,
   getTotalSellOffers,
   getTotalTokenHolder,
@@ -146,6 +147,16 @@ const TokenSalePage = () => {
                     }}
                   >
                     BuyToken
+                  </button>
+                  <button
+                    className="p-2 m-1 bg-red-700 text-white rounded-md"
+                    onClick={async function (j) {
+                      const tx = await cancelSellOffer(
+                        tcontract );
+                      console.log(tx);
+                    }}
+                  >
+                    Cancel Sell 
                   </button>
                 </div>
               </div>
