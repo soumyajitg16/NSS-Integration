@@ -237,8 +237,8 @@ const MyTokensPage = () => {
                         if (sellOFF.amount!=0) {
                           return (
                             <div className="flex justify-center items-center"> 
-                              <div className="mx-4">
-                                Sales Active :{ethers.utils.formatUnits(sellOFF.amount, 18)}
+                              <div className="mx-4 text-xl font-bold">
+                                Sales Active: {ethers.utils.formatUnits(sellOFF.amount, 18)}
                               </div>
                               <button onClick={async function (j) {
                                  const tx = await cancelSellOffer(
