@@ -202,7 +202,7 @@ const MyTokensPage = () => {
                       </p>
                       <p className="m-1">Total Shares: 1250</p>
                       <div className=" font-semibold text-lg">
-                        Your Balance: { (sellOFF.amount==0)  ?  ethers.utils.formatUnits(balance, 18):ethers.utils.formatUnits(balance, 18)+" - Sales Active "}
+                        Your Balance: { ethers.utils.formatUnits(balance, 18)}
                       </div>
                       <input
                         onChange={function (e) {
@@ -236,7 +236,10 @@ const MyTokensPage = () => {
                         // console.log(vaultdetails[i.id].sellingState)
                         if (sellOFF.amount!=0) {
                           return (
-                            <div>
+                            <div className="flex justify-center items-center"> 
+                              <div className="mx-4">
+                                Sales Active :{ethers.utils.formatUnits(sellOFF.amount, 18)}
+                              </div>
                               <button onClick={async function (j) {
                                  const tx = await cancelSellOffer(
                                   TOKENcontract[i.id] );

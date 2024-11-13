@@ -148,7 +148,7 @@ const TokenSalePage = () => {
                   >
                     BuyToken
                   </button>
-                  <button
+                  {/* <button
                     className="p-2 m-1 bg-red-700 text-white rounded-md"
                     onClick={async function (j) {
                       const tx = await cancelSellOffer(
@@ -157,7 +157,7 @@ const TokenSalePage = () => {
                     }}
                   >
                     Cancel Sell 
-                  </button>
+                  </button> */}
                 </div>
               </div>
             );
