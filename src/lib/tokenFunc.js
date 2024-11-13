@@ -78,6 +78,10 @@ export async function getTotalSellOffers(_contract) {
   const totalOffers = await _contract.getTotalSellOffers();
   return totalOffers;
 }
+export async function getTotalTokenHolder(_contract) {
+  const totalOffers = await _contract.getTotalTokenHolder();
+  return totalOffers;
+}
 
 /**
  * Gets information about a specific sell offer based on its index.

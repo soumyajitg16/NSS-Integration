@@ -8,6 +8,7 @@ import {
   buyTokens,
   getSellOffer,
   getTotalSellOffers,
+  getTotalTokenHolder,
   name,
   symbol,
 } from "../lib/tokenFunc";
@@ -70,13 +71,18 @@ const TokenSalePage = () => {
         setTContract(_Tcontract);
 
         const totalsellOffers = (
-          await getTotalSellOffers(_Tcontract)
+          await getTotalTokenHolder(_Tcontract)
         ).toNumber();
 
         let getSellOffers_ = [];
         for (let i = 0; i < totalsellOffers; i++) {
+
           let temp = await getSellOffer(_Tcontract, i);
-          getSellOffers_.push(temp);
+          if(temp[1]!=0){
+            console.log(temp[1])
+            getSellOffers_.push(temp);
+          }
+          
         }
         setGetSellOffers(getSellOffers_);
         console.log(getSellOffers);
