@@ -19,6 +19,9 @@ import Navbar from "../components/navbar";
 
 const TokenSalePage = () => {
   // const [i, setI] = useRecoilState(iAtom);
+  const [metamask, setMetamask] = useState()
+  const [acc, setAcc] = useState()
+
   const [nft, setNFT] = useState(null);
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState();
@@ -103,6 +106,42 @@ const TokenSalePage = () => {
   return (
     <center>
       <Navbar></Navbar>
+      <div className='flex justify-center m-3 flex-col items-center '>
+        <button className='bg-black text-white px-4 p-2 rounded-lg text-xl' onClick={async function () {
+          if (window.ethereum) {
+            const ethersProvider = new ethers.providers.Web3Provider(
+              window.ethereum
+            );
+            setMetamask(window.ethereum)
+            setProvider(ethersProvider);
+    
+            const accounts = await window.ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            const signer = ethersProvider.getSigner();
+            setSigner(signer);
+            window.ethereum.on("accountsChanged", async ()=>{
+              const accounts = await provider.send("eth_requestAccounts", []);
+              const account = accounts[0];
+              setAcc(account);
+              alert("Account is Changed");
+          });
+    
+            const _contract = new ethers.Contract(
+              contractAddress,
+              contractABI,
+              signer
+            );
+            setContract(_contract);
+            setAcc(accounts[0])
+            await fetchVaultsAndNFTs(_contract, signer, accounts[0]);
+          } else {
+            alert("install metamask")
+          }
+
+        }}>{signer ? "Address: " + acc : " Connect MetaMask"}</button>
+        {/* <p className='text-cyan-300'>*Make Sure You Have Added amoy TestNet to your Metamask*</p> */}
+      </div>
       <div>
         <div className="bg-slate-100  pb-2">
           <div className="text-4xl m-2 font-bold">Name: {tname}</div>
