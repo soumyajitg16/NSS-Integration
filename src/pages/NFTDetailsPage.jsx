@@ -26,6 +26,9 @@ const NFTDetailsPage = () => {
   const [ttlamnt, setTtlamnt] = useState();
   const [percentage, setpercentage] = useState();
   const [time, setTime] = useState();
+  const [metamask, setMetamask] = useState()
+  const [acc, setAcc] = useState()
+
 
   useEffect(() => {
     const loadProvider = async () => {
@@ -117,6 +120,42 @@ const NFTDetailsPage = () => {
   return (
     <div>
       <Navbar></Navbar>
+      <div className='flex justify-center m-3 flex-col items-center '>
+        <button className='bg-black text-white px-4 p-2 rounded-lg text-xl' onClick={async function () {
+          if (window.ethereum) {
+            const ethersProvider = new ethers.providers.Web3Provider(
+              window.ethereum
+            );
+            setMetamask(window.ethereum)
+            setProvider(ethersProvider);
+    
+            const accounts = await window.ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            const signer = ethersProvider.getSigner();
+            setSigner(signer);
+            window.ethereum.on("accountsChanged", async ()=>{
+              const accounts = await provider.send("eth_requestAccounts", []);
+              const account = accounts[0];
+              setAcc(account);
+              alert("Account is Changed");
+          });
+    
+            const _contract = new ethers.Contract(
+              contractAddress,
+              contractABI,
+              signer
+            );
+            setContract(_contract);
+            setAcc(accounts[0])
+            await fetchVaultsAndNFTs(_contract, signer, accounts[0]);
+          } else {
+            alert("install metamask")
+          }
+
+        }}>{signer ? "Address: " + acc : " Connect MetaMask"}</button>
+        {/* <p className='text-cyan-300'>*Make Sure You Have Added amoy TestNet to your Metamask*</p> */}
+      </div>
       <h1 className=" flex justify-center text-4xl font-extrabold p-3">
         NFT Details
       </h1>
